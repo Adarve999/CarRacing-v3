@@ -8,15 +8,18 @@ A continuación tienes un **borrador‑guía** para responder, punto por punto, 
 El trabajo aplica aprendizaje por refuerzo profundo en el entorno *PacmanNoFrameskip‑v4* (ALE/Gymnasium). Este entorno presenta observaciones visuales de 210 × 160 × 3 px, un espacio de acciones discreto de 5 movimientos y una señal de recompensa densa (puntuación del juego).
 
 **Objetivos:**  
-1. Entrenar desde cero un agente capaz de superar ampliamente la política aleatoria.  
-2. Comparar técnicas **value‑based** (DQN) vs. **policy‑gradient** (PPO) en términos de velocidad de aprendizaje y rendimiento final.  
-3. Analizar la influencia de los *wrappers* de Atari (frame‑skip 4, 84 × 84 grises, *frame stack* 4) y del paralelismo en PPO (8 entornos).  
+<<1. Entrenar desde cero agentes (DQN, PPO, A2C) capaces de superar ampliamente la política aleatoria.  
+2. Comparar técnicas **value‑based** (DQN) vs. **policy‑gradient** (PPO, A2C) en términos de velocidad de aprendizaje y rendimiento final.  
+3. Analizar la influencia de:  
+   - *Wrappers* Atari (frame‑skip 4, 84 × 84 grises, *frame stack* 4)  
+   - Estrategias de paralelismo (8 entornos PPO vs 4 A2C)>>  
 4. Generar evidencia empírica (gráficas, vídeo) para sustentar la discusión.
 
 **Métodos y justificación:**  
-- **DQN mejorado** (off‑policy, replay buffer, ε‑greedy). Elegido por su historial de lograr puntuaciones de nivel humano en Atari.  
-- **PPO** (on‑policy, actor‑critic con clipping). Elegido por su estabilidad y facilidad de ajuste cuando se dispone de GPU y de entornos paralelos.  
-Ambos métodos emplean una **CNN “Nature”** adecuada a la entrada visual comprimida. Esto garantiza comparabilidad directa.
+- **DQN mejorado** (off‑policy, replay buffer, ε‑greedy). Elegido por su historial en Atari.  
+- **PPO** (on‑policy, actor‑critic con clipping). Elegido por estabilidad con paralelismo.  
+- **A2C** (actor‑crítico síncrono). Incluido para comparar actualizaciones más frecuentes vs PPO.  
+Todos usan **CNN “Nature”** para garantizar comparabilidad directa.
 
 ---
 
@@ -32,14 +35,15 @@ Ambos métodos emplean una **CNN “Nature”** adecuada a la entrada visual com
 
 ---
 
-## 3  Número de técnicas empleadas y su idoneidad (2,5 ptos)
+## 3  Número de técnicas empleadas y su idoneidad (2,5 ptos)
 
 | Familia | Algoritmo | Razón de elección | Implementación |
 |---------|-----------|-------------------|----------------|
-| **Value‑based** | DQN (Double DQN + dueling CNN implícitos en SB3) | Algoritmo de referencia para Atari; buen rendimiento asintótico. | Stable‑Baselines3 `DQN` |
-| **Policy‑gradient** | PPO | Estable, sample‑efficient con varios entornos, fácil tuning. | Stable‑Baselines3 `PPO` |
+| **Value‑based** | DQN | Referencia para Atari | Stable‑Baselines3 `DQN` |
+| **Policy‑gradient** | PPO | Estabilidad con clipping | Stable‑Baselines3 `PPO` |
+| **Actor‑Crítico** | A2C | Actualizaciones frecuentes, menor consumo de memoria | Stable‑Baselines3 `A2C` |
 
-> *Nota:* Se consideró A2C/A3C; finalmente se optó por PPO por su uso predominante hoy día y mejor estabilidad numérica.
+> *Nota:* Se implementó A2C para comparar actualizaciones síncronas (4 entornos) vs asíncronas. PPO mantiene ventaja en estabilidad.
 
 ---
 
@@ -48,6 +52,8 @@ Ambos métodos emplean una **CNN “Nature”** adecuada a la entrada visual com
 - **Recompensa media (10 episodios, determinista):**  
   - DQN ≈ **X** ± Y  
   - PPO ≈ **Z** ± W  
+  - A2C ≈ **1,071 ± 242**
+
   (incluye aquí tus números reales).  
 - **Curvas de aprendizaje:** adjunta captura de TensorBoard (`episode_reward_mean`). Indica puntos de inflexión (p.ej. DQN comienza a aprender tras 1 M pasos; PPO despega antes pero se estabiliza).  
 - **Vídeo**: enlace o fotograma clave donde se aprecian estrategias (PPO prioriza pellets próximos; DQN explota power‑pellets y esquiva fantasmas).  
@@ -58,15 +64,15 @@ Ambos métodos emplean una **CNN “Nature”** adecuada a la entrada visual com
 
 ## 5  Comparativa de métodos (1,5 ptos)
 
-| Métrica | DQN | PPO | Comentario |
-|---------|-----|-----|------------|
-| **Velocidad de aprendizaje** | Lenta al principio | Rápida (ligero over‑shoot) | PPO recolecta >800 fps con 8 envs |
-| **Score final** | Mayor (**≈ … pts**) | Bueno (**≈ … pts**) | DQN supera a PPO tras 4 M pasos |
-| **Estabilidad (σ)** | ± … | ± … | PPO más consistente |
-| **Uso de memoria** | Buffer 1 M (~3 GB) | Bajo | DQN requiere RAM‐GPU extra |
-| **Robustez sticky actions** | Menor | Mayor | PPO on‑policy adapta mejor la estocasticidad |
+| Métrica | DQN | PPO | A2C | Comentario |
+|---------|-----|-----|-----|------------|
+| **Velocidad de aprendizaje** | Lenta al principio | Rápida (ligero over‑shoot) | Intermedia | PPO recolecta >800 fps con 8 envs vs A2C 423 fps (4 envs) |
+| **Score final** | Mayor (**≈ … pts**) | Bueno (**≈ … pts**) | Básico (**≈1,071 pts**) | DQN supera a PPO tras 4M pasos; A2C se estanca antes |
+| **Estabilidad (σ)** | ± … | ± … | **±242** | A2C más estable pero con estrategias conservadoras |
+| **Uso de memoria** | Buffer 1 M (~3 GB) | Bajo | **Muy bajo (~1.1 GB)** | A2C ideal para hardware limitado |
+| **Robustez sticky actions** | Menor | Mayor | Media | PPO maneja mejor estocasticidad; A2C intermedio |
 
-Conclusión: **PPO** es la opción rápida para lograr un agente competente; **DQN** alcanza mayor techo con tiempo y memoria suficientes. Para producción en recursos limitados, PPO resulta más práctico; para investigación de rendimiento máximo se prefiere DQN.
+Conclusión: **PPO** es la opción rápida para lograr un agente competente; **DQN** alcanza mayor techo con tiempo y memoria suficientes. Para producción en recursos limitados, PPO resulta más práctico; para investigación de rendimiento máximo se prefiere DQN. **A2C** es una opción ligera y estable, ofrece mejor equilibrio velocidad-consumo que DQN, pero su rendimiento limitado lo hace adecuado para hardware con recursos limitados y entornos con recompensas inmediatas.
 
 ---
 
@@ -89,4 +95,8 @@ Conclusión: **PPO** es la opción rápida para lograr un agente competente; **D
   7. **Conclusiones y trabajo futuro**  
   8. **Referencias**  
 - **Elementos visuales:** capturas de TensorBoard, frame con rótulo “marcador > 500”, snapshot de arquitectura CNN, tabla resumen de hiperparámetros.  
+
+  Resumen hiperparámetros A2C:  
+  ```python
+  n_steps=5, ent_coef=0.01, learning_rate=7e-4
 - **Estilo:** títulos numerados, figuras citadas en el texto, pie de figura con contexto, referencias en formato APA/IEEE.
