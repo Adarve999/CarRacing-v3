@@ -1,7 +1,3 @@
-A continuación se presenta una versión ampliada y completada de tu **README**, estructurada en secciones numeradas y enriquecida con justificaciones, métricas y referencias bibliográficas de alto nivel.
-
-En este documento describimos el **contexto**, los **objetivos**, la **metodología**, el **trabajo realizado**, la **interpretación de resultados**, la **comparativa de métodos** y una propuesta de **estructura** para la memoria final. Además, explicamos por qué cada algoritmo es adecuado para *Ms‑Pac‑Man*, apoyándonos en resultados y estudios de referencia.
-
 ## 1  Definición del contexto, objetivos y métodos de RL (1 pto)
 
 **Contexto:**  
