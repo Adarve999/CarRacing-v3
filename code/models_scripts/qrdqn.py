@@ -9,7 +9,7 @@ gym.register_envs(ale_py)
 
 def mainQRDQN():
     # 1) Crea el entorno MsPacman con renderizado RGB
-    env = gym.make("ALE/MsPacman-v5", render_mode="rgb_array")
+    env = gym.make("ALE/MsPacman-v5")
 
 
     # 2) Define y construye el modelo DQN con hiperparámetros
@@ -21,14 +21,14 @@ def mainQRDQN():
     model = QRDQN(
         "CnnPolicy",
         env,
-        learning_rate=lambda f: 2.5e-5 * (1 - f),
+        learning_rate=2.5e-4,
         buffer_size=200_000,
         learning_starts=80_000,
-        batch_size=32,
+        batch_size=128,
         gamma=0.99,
         train_freq=4,
         gradient_steps=1,
-        target_update_interval=4_000,
+        target_update_interval=10_000,
         exploration_fraction=0.12,
         exploration_initial_eps=1.0,
         exploration_final_eps=0.01,
@@ -39,7 +39,7 @@ def mainQRDQN():
 
     # 3) Entrena el modelo
     model.learn(
-        total_timesteps=5_000_000,
+        total_timesteps=1_000_000,
         progress_bar=True
     )
 

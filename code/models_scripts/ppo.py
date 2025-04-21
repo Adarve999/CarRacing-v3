@@ -9,7 +9,7 @@ gym.register_envs(ale_py)
 
 def mainPPO():
     # 1) Crea el entorno MsPacman con renderizado RGB
-    env = gym.make("ALE/MsPacman-v5", render_mode="rgb_array")
+    env = gym.make("ALE/MsPacman-v5")
 
     # 2) Define y construye el modelo DQN con hiperparámetros
     model = PPO(
@@ -31,7 +31,7 @@ def mainPPO():
 
     # 3) Entrena el modelo
     model.learn(
-        total_timesteps=5_000_000,
+        total_timesteps=1_000_000,
         progress_bar=True
     )
 

@@ -14,7 +14,7 @@ TOTAL_FRAMES_TUNE = 100_000
 SEED = 42
 
 def objective(trial: optuna.Trial) -> float:
-    env = gym.make("ALE/MsPacman-v5", render_mode="rgb_array")
+    env = gym.make("ALE/MsPacman-v5")
     print("cuda" if torch.cuda.is_available() else "cpu")
     lr        = trial.suggest_loguniform("learning_rate", 5e-4, 5e-3)
     buff_size = trial.suggest_categorical("buffer_size", [100_000])
@@ -43,7 +43,7 @@ def objective(trial: optuna.Trial) -> float:
         device               = "cuda" if torch.cuda.is_available() else "cpu"
     )
 
-    eval_env = DummyVecEnv([lambda: gym.make("ALE/MsPacman-v5", render_mode="rgb_array")])
+    eval_env = DummyVecEnv([lambda: gym.make("ALE/MsPacman-v5")])
     model.learn(TOTAL_FRAMES_TUNE, progress_bar=False)
     mean_reward, _ = evaluate_policy(model, eval_env, n_eval_episodes=10, deterministic=True)
     env.close()
@@ -52,7 +52,7 @@ def objective(trial: optuna.Trial) -> float:
 
 def mainDQN_Optuna():
     # 1) Crea el entorno MsPacman con renderizado RGB
-    env = gym.make("ALE/MsPacman-v5", render_mode="rgb_array")
+    env = gym.make("ALE/MsPacman-v5")
 
 
     study = optuna.create_study(
@@ -68,7 +68,7 @@ def mainDQN_Optuna():
         env=env,
         learning_starts=50_000,
         exploration_initial_eps=1.0,
-        exploration_final_eps=0.05,
+        exploration_final_eps=0.01,
         target_update_interval=10_000,
         verbose=1,
         seed=SEED,
@@ -81,7 +81,7 @@ def mainDQN_Optuna():
 
     # 3) Entrena el modelo
     model.learn(
-        total_timesteps=5_000_000,
+        total_timesteps=1_000_000,
         progress_bar=True
     )
 
