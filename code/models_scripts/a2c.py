@@ -24,7 +24,7 @@ def mainA2C():
         rms_prop_eps=1e-5,  # RMSProp epsilon (default varies)
         use_rms_prop=True,  # Whether to use RMSprop (default) or Adam
         verbose=1,
-        device="auto"  # Use GPU if available
+        device="cuda"  # Use GPU if available
     )
 
     # 3) Entrena el modelo

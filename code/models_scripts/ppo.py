@@ -26,7 +26,7 @@ def mainPPO():
         vf_coef=0.5,
         max_grad_norm=0.5,
         verbose=1,
-        device="auto"
+        device="cuda"
     )
 
     # 3) Entrena el modelo

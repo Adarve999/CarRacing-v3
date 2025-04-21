@@ -72,7 +72,7 @@ def mainDQN_Optuna():
         target_update_interval=10_000,
         verbose=1,
         seed=SEED,
-        device="auto"
+        device="cuda"
     )
     BEST_PARAMS.update(study.best_params)   
     

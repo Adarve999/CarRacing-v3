@@ -34,7 +34,7 @@ def mainQRDQN():
         exploration_final_eps=0.01,
         policy_kwargs=policy_kwargs,
         verbose=1,
-        device="auto",
+        device="cuda",
     )
 
     # 3) Entrena el modelo
