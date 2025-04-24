@@ -23,7 +23,7 @@ def make_eval_env(modelIdentifier="model", max_steps=2000 ,record=False):
     if record:
         env = RecordVideo(
             env,
-            video_folder="videos/",
+            video_folder=f"../videos/{modelIdentifier}/",
             name_prefix=f"{modelIdentifier}",
             episode_trigger=lambda ep: True,
             video_length=0

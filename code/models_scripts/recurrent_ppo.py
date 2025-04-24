@@ -1,4 +1,4 @@
-from code.utils.utils import make_env
+from utils.utils import make_env
 import gymnasium as gym
 import ale_py
 from sb3_contrib import RecurrentPPO
@@ -10,10 +10,10 @@ def trainRecurrentPPO():
     num_envs = 8
 
     log_dir = "../logs/tensorboard/"
-    log_name = "rppo_carracing_lstm"
+    log_name = "recurrent_ppo_carracing"
     os.makedirs(log_dir, exist_ok=True)
 
-    envs = SubprocVecEnv([make_env(i) for i in range(num_envs)])
+    envs = SubprocVecEnv([make_env() for i in range(num_envs)])
     envs = VecMonitor(envs)
 
     model = RecurrentPPO(
