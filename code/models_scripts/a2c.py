@@ -1,44 +1,40 @@
-import gymnasium as gym
-import ale_py
+import os
+from utils.utils import make_env
 from stable_baselines3 import A2C
-gym.register_envs(ale_py)
-
-# Asegúrate de tener instalado:
-# pip install gymnasium[atari,accept-rom-license] stable-baselines3
+from stable_baselines3.common.vec_env import SubprocVecEnv,VecMonitor
 
 
-def mainA2C():
-    # 1) Crea el entorno MsPacman con renderizado RGB
-    env = gym.make("ALE/MsPacman-v5")
+def trainA2C():
+    num_envs = 8
 
-    # 2) Define y construye el modelo DQN con hiperparámetros
+    log_dir = "../logs/tensorboard/"
+    log_name = "a2c_carracing"
+    os.makedirs(log_dir, exist_ok=True)
+
+    envs = SubprocVecEnv([make_env() for i in range(num_envs)])
+    envs = VecMonitor(envs)
+
     model = A2C(
-        policy="CnnPolicy",
-        env=env,
-        gamma=0.99,
-        n_steps=1024,  # Number of steps to run for each environment per update
-        vf_coef=0.25,  # Value function coefficient in the loss calculation
-        ent_coef=0.01,  # Entropy coefficient for the loss calculation
-        max_grad_norm=0.5,  # The maximum value for the gradient clipping
-        learning_rate=7e-4,  # The learning rate
-        rms_prop_eps=1e-5,  # RMSProp epsilon (default varies)
-        use_rms_prop=True,  # Whether to use RMSprop (default) or Adam
+        "CnnPolicy",
+        envs,
+        device="cuda",
         verbose=1,
-        device="cuda"  # Use GPU if available
-    )
+        n_steps=1024,
+        gamma=0.99,
+        gae_lambda=1.0,
+        learning_rate=7e-4,
+        ent_coef=0.01,
+        vf_coef=0.25, 
+        max_grad_norm=0.5,
+        rms_prop_eps=1e-5,
+        tensorboard_log=log_dir
+        )
 
-    # 3) Entrena el modelo
-    model.learn(
-        total_timesteps=1_000_000,
-        progress_bar=True
-    )
-
-    # 4) Guarda los pesos entrenados
-    model.save("../models/a2c/a2c_msPacman")
-
-    # 5) Cierra el entorno
-    env.close()
+    model.learn(total_timesteps=1_000_000, tb_log_name=log_name)
+    model.save("../models/a2c/a2c_carracing")
+    envs.close()
 
 
 if __name__ == "__main__":
-    mainA2C()
+    trainA2C()
+
