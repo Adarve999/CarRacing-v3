@@ -1,20 +1,21 @@
-import gymnasium as gym
-import ale_py
+import os
+from utils.utils import make_env, make_eval_env
 from stable_baselines3 import DQN
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.evaluation import evaluate_policy
-gym.register_envs(ale_py)
+from stable_baselines3.common.vec_env import SubprocVecEnv,VecMonitor
 import optuna
 import torch
-# Asegúrate de tener instalado:
-# pip install gymnasium[atari,accept-rom-license] stable-baselines3
-
 
 TOTAL_FRAMES_TUNE = 100_000
 SEED = 42
 
 def objective(trial: optuna.Trial) -> float:
-    env = gym.make("ALE/MsPacman-v5")
+    
+    num_envs = 8
+    envs = SubprocVecEnv([make_env() for i in range(num_envs)])
+    envs = VecMonitor(envs)
+    
     print("cuda" if torch.cuda.is_available() else "cpu")
     lr        = trial.suggest_loguniform("learning_rate", 5e-4, 5e-3)
     buff_size = trial.suggest_categorical("buffer_size", [100_000])
@@ -26,7 +27,7 @@ def objective(trial: optuna.Trial) -> float:
 
     model = DQN(
         "CnnPolicy", 
-        env,
+        envs,
         learning_rate        = lr,
         buffer_size          = buff_size,
         batch_size           = batch_sz,
@@ -43,16 +44,22 @@ def objective(trial: optuna.Trial) -> float:
         device               = "cuda" if torch.cuda.is_available() else "cpu"
     )
 
-    eval_env = DummyVecEnv([lambda: gym.make("ALE/MsPacman-v5")])
+    eval_env = make_eval_env()
     model.learn(TOTAL_FRAMES_TUNE, progress_bar=False)
     mean_reward, _ = evaluate_policy(model, eval_env, n_eval_episodes=10, deterministic=True)
-    env.close()
+    envs.close()
     return mean_reward
 
 
-def mainDQN_Optuna():
-    # 1) Crea el entorno MsPacman con renderizado RGB
-    env = gym.make("ALE/MsPacman-v5")
+def trainDQN_Optuna():
+    num_envs = 8
+
+    log_dir = "../logs/tensorboard/"
+    log_name = "dqn_optuna_carracing"
+    os.makedirs(log_dir, exist_ok=True)
+
+    envs = SubprocVecEnv([make_env() for i in range(num_envs)])
+    envs = VecMonitor(envs)
 
 
     study = optuna.create_study(
@@ -65,7 +72,7 @@ def mainDQN_Optuna():
     
     BEST_PARAMS = dict(
         policy="CnnPolicy",
-        env=env,
+        env=envs,
         learning_starts=50_000,
         exploration_initial_eps=1.0,
         exploration_final_eps=0.01,
@@ -80,17 +87,14 @@ def mainDQN_Optuna():
     model = DQN(**BEST_PARAMS)
 
     # 3) Entrena el modelo
-    model.learn(
-        total_timesteps=1_000_000,
-        progress_bar=True
-    )
+    model.learn(total_timesteps=1_000_000, tb_log_name=log_name)
 
     # 4) Guarda los pesos entrenados
-    model.save("../models/dqn_optuna/dqn_optuna_msPacman")
+    model.save("../models/dqn_optuna/dqn_optuna_carracing")
 
     # 5) Cierra el entorno
-    env.close()
+    envs.close()
 
 
 if __name__ == "__main__":
-    mainDQN_Optuna()
+    trainDQN_Optuna()
