@@ -7,7 +7,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv,VecMonitor
 import optuna
 import torch
 
-TOTAL_FRAMES_TUNE = 100_000
+TOTAL_FRAMES_TUNE = 200_000
 SEED = 42
 
 def objective(trial: optuna.Trial) -> float:
