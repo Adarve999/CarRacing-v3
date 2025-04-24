@@ -1,46 +1,37 @@
-import gymnasium as gym
-import ale_py
+import os
+from utils.utils import make_env
 from stable_baselines3 import PPO
-gym.register_envs(ale_py)
+from stable_baselines3.common.vec_env import SubprocVecEnv,VecMonitor
 
-# Asegúrate de tener instalado:
-# pip install gymnasium[atari,accept-rom-license] stable-baselines3
+def trainPPO():
+    num_envs = 8
 
+    log_dir = "../logs/tensorboard/"
+    log_name = "ppo_carracing"
+    os.makedirs(log_dir, exist_ok=True)
 
-def mainPPO():
-    # 1) Crea el entorno MsPacman con renderizado RGB
-    env = gym.make("ALE/MsPacman-v5")
+    envs = SubprocVecEnv([make_env() for i in range(num_envs)])
+    envs = VecMonitor(envs)
 
-    # 2) Define y construye el modelo DQN con hiperparámetros
-    model = PPO(
-        policy="CnnPolicy",
-        env=env,
-        n_steps=1024,             
-        batch_size=256,
-        n_epochs=10,
-        gamma=0.99,
-        gae_lambda=0.95,
-        learning_rate=2.5e-4, 
-        ent_coef=0.01,
-        clip_range=0.1,
-        vf_coef=0.5,
-        max_grad_norm=0.5,
-        verbose=1,
-        device="cuda"
-    )
+    model = PPO("CnnPolicy", 
+                envs, 
+                device="cuda", 
+                verbose=1, 
+                n_steps=1024, 
+                batch_size=64, 
+                n_epochs=10, 
+                gamma=0.99, 
+                gae_lambda=0.95, 
+                clip_range=0.2,
+                ent_coef=0.01, 
+                max_grad_norm=0.5, 
+                tensorboard_log=log_dir
+                )
 
-    # 3) Entrena el modelo
-    model.learn(
-        total_timesteps=1_000_000,
-        progress_bar=True
-    )
-
-    # 4) Guarda los pesos entrenados
-    model.save("../models/ppo/ppo_msPacman")
-
-    # 5) Cierra el entorno
-    env.close()
+    model.learn(total_timesteps=1_000_000, tb_log_name=log_name)
+    model.save("../models/ppo/ppo_carracing")
+    envs.close()
 
 
 if __name__ == "__main__":
-    mainPPO()
+    trainPPO()

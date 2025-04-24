@@ -3,7 +3,6 @@ import gymnasium as gym
 from gymnasium.wrappers import (RecordVideo)
 import base64
 from pathlib import Path
-
 from IPython import display as ipythondisplay
 
 def make_env():

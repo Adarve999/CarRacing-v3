@@ -1,9 +1,6 @@
-from utils.utils import make_env
-import gymnasium as gym
-import ale_py
-from sb3_contrib import RecurrentPPO
-gym.register_envs(ale_py)
 import os
+from utils.utils import make_env
+from sb3_contrib import RecurrentPPO
 from stable_baselines3.common.vec_env import SubprocVecEnv,VecMonitor
 
 def trainRecurrentPPO():
