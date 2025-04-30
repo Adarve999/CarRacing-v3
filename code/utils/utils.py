@@ -5,18 +5,18 @@ import base64
 from pathlib import Path
 from IPython import display as ipythondisplay
 
-def make_env():
+def make_env(continuousMode = False):
     def _init():
-        env = gym.make("CarRacing-v3", render_mode="rgb_array",continuous=False)
+        env = gym.make("CarRacing-v3", render_mode=None, continuous= continuousMode)
         return env
     return _init 
 
 
-def make_eval_env(modelIdentifier="model", max_steps=2000 ,record=False):
+def make_eval_env(modelIdentifier="model", max_steps=2000 ,record=False,continuousMode = False):
     env = gym.make(
         "CarRacing-v3",
         render_mode="rgb_array",
-        continuous=False,
+        continuous=continuousMode,
         max_episode_steps=max_steps)
 
     if record:
