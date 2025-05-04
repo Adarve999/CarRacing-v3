@@ -28,7 +28,7 @@ Todos los experimentos se entrenan durante **1 M de pasos** y guardan dos vuelta
 
 ---
 
-## ⚙️ Ejecución local (vía Visual Studio Code)
+## Ejecución local (vía Visual Studio Code)
 
 > Todo el entrenamiento, la evaluación y la grabación de vídeos se orquestan desde el notebook `src/CarRacing-v3-Practice.ipynb`.
 > Solo necesitas crear el entorno Conda y abrir Visual Studio Code.
@@ -69,7 +69,7 @@ Los gráficos se actualizarán en tiempo real mientras las celdas de entrenamien
 
 ---
 
-# 📈 Conclusiones
+# Conclusiones
 
 | Algoritmo         | Recompensa media ± σ (10 episodios) | Observaciones (versión “no técnica”)                                                              |
 | ----------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------- |
