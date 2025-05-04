@@ -8,7 +8,7 @@
   <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
 </p>
 
-# Conducción Autónoma en **CarRacing-v3** 🏎️ con Deep Reinforcement Learning
+# Conducción Autónoma en **CarRacing-v3** 🏎️
 
 Este proyecto explora cómo distintos enfoques de *Deep Reinforcement Learning* resuelven la tarea de conducir un coche lo más rápido posible sin salirse de pista en **CarRacing-v3** (Gymnasium).
 El entorno devuelve exclusivamente píxeles y un espacio de **5 acciones discretas**, de modo que cada algoritmo debe:
@@ -28,39 +28,44 @@ Todos los experimentos se entrenan durante **1 M de pasos** y guardan dos vuelta
 
 ---
 
-# Ejecución local desde cero
+## ⚙️ Ejecución local (vía Visual Studio Code)
 
-#### 1. Clona el repositorio
+> Todo el entrenamiento, la evaluación y la grabación de vídeos se orquestan desde el notebook `src/CarRacing-v3-Practice.ipynb`.
+> Solo necesitas crear el entorno Conda y abrir Visual Studio Code.
+
+#### 1 · Clona el repositorio
 
 ```bash
 git clone https://github.com/Adarve999/CarRacing-v3.git
 cd CarRacing-v3
 ```
 
-#### 2. Crea y activa el entorno
+#### 2 · Crea y activa el entorno
 
 ```bash
 conda env create -f requirements.yml
 conda activate rl_env
 ```
 
-#### 3. Entrena (ejemplo PPO)
+#### 3 · Abre el proyecto en Visual Studio Code
 
-```bash
-python src/models_scripts/ppo.py
-```
+* Abre el notebook **`src/CarRacing-v3-Practice.ipynb`**.
+* Elige **rl_env** (el entorno Conda que acabas de crear), donde pone arriba a la derecha *Select Kernel*.
+* Ejecuta las celdas en orden:
 
-#### 4. Lanza TensorBoard
+  1. entrena el algoritmo seleccionado,
+  2. evalúa la recompensa media,
+  3. graba dos vueltas en `videos/<modelo>/`,
+  4. muestra los vídeos incrustados.
 
+#### 4 · Sigue el entrenamiento con TensorBoard
+
+En una ventana de la terminal de conda, lanza el siguiente comando para monitorear el entrenamiento.
 ```bash
 tensorboard --logdir logs/tensorboard
 ```
 
-#### 5. Reproduce una vuelta grabada
-
-```bash
-python -m utils.show_videos videos/ppo --prefix ppo
-```
+Los gráficos se actualizarán en tiempo real mientras las celdas de entrenamiento están corriendo.
 
 ---
 
