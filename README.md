@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/ppoLSTM.gif" alt="CarRacing-v3 banner" width="50%"/>
+  <img src="images/allModels.gif" alt="CarRacing-v3 banner" width="50%"/>
 </p>
 
 <p align="center">
